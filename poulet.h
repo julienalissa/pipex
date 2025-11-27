@@ -13,7 +13,7 @@ typedef struct s_list
 	char	**env;
 	char	**argv_cmd;
 	char	*path;
-	int		p_pipe[2];
+	int		p_pipe;
 	int		n_pipe[2];
 	int		fd_file1;
 	int		fd_file2;

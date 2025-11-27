@@ -14,11 +14,12 @@ void	ft_define_value(t_list *value, int argc, char **argv, char **environ)
 		perror("file1");
 		exit (1);
 	}
-	value->fd_file2 = open(argv[argc - 1], O_WRONLY);
+	value->fd_file2 = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (value->fd_file2 == -1)
 	{
+		close(value->fd_file1);
 		perror("file2");
-		exit (1);
+		exit(1);
 	}
 }
 
@@ -38,9 +39,15 @@ void	ft_close_fd_files(t_list *value)
 
 void	ft_close_middle(t_list *value)
 {
-	close(value->p_pipe[0]);
-	close(value->p_pipe[1]);
+	close(value->p_pipe);
 	close(value->n_pipe[0]);
+	close(value->n_pipe[1]);
+	close(value->fd_file2);
+}
+
+void	ft_close_middle_v2(t_list *value)
+{
+	close(value->p_pipe);
 	close(value->n_pipe[1]);
 	close(value->fd_file2);
 }
@@ -61,7 +68,6 @@ int	main(int argc, char **argv, char **environ)
 		perror("pipe");
 		return (1);
 	}
-	printf(";asldf");
 
 	value.fork_id = fork();
 
@@ -69,6 +75,8 @@ int	main(int argc, char **argv, char **environ)
 	if (value.fork_id == -1)
 	{
 		ft_close_fd_files(&value);
+		close(value.n_pipe[0]);
+		close(value.n_pipe[1]);
 		perror("fork");
 		exit(1);
 	}
@@ -94,18 +102,15 @@ int	main(int argc, char **argv, char **environ)
 		exit(1);
 	}
 
-	value.p_pipe[0] = value.n_pipe[0];
-	value.p_pipe[1] = -1;
+	value.p_pipe = value.n_pipe[0];
 	close(value.fd_file1);
-	close(value.n_pipe[0]);
 	close(value.n_pipe[1]);
-	printf("1  ");
 	while (value.i < argc - 2)
 	{
 		if (pipe(value.n_pipe) == -1)
 		{
-			close(value.p_pipe[0]);
-			close(value.fd_file1);
+			close(value.p_pipe);
+			close(value.fd_file2);
 			perror("pipe");
 		    exit(1);
 		}
@@ -118,15 +123,15 @@ int	main(int argc, char **argv, char **environ)
 		}
 		if (value.fork_id == 0)
 		{
-			if (dup2(value.p_pipe[0], 0) == -1)
+			if (dup2(value.p_pipe, 0) == -1)
 			{
-				ft_close_middle(&value);
+				ft_close_middle_v2(&value);
 				perror("dup2");
 				exit(1); //check_wait pour close parent commen ft_close_middle
 			}
 			if (dup2(value.n_pipe[1], 1) == -1)
 			{
-				ft_close_middle(&value);
+				ft_close_middle_v2(&value);
 				perror("dup2");
 				exit(1);  //check_wait pour close parent commen ft_close_middle
 			}
@@ -136,13 +141,10 @@ int	main(int argc, char **argv, char **environ)
 			execve(value.path, value. argv_cmd, value.env);
 			exit(1);
 		}
-		if (value.i < argc - 2)
-			close(value.p_pipe[0]);
-		value.p_pipe[0] = value.n_pipe[0];
-		value.p_pipe[1] = -1;
-
-		close(value.n_pipe[0]);
+		close(value.p_pipe);
 		close(value.n_pipe[1]);
+		value.p_pipe = value.n_pipe[0];
+		value.i++;
 	}
 
 
@@ -151,35 +153,35 @@ int	main(int argc, char **argv, char **environ)
 	value.fork_id = fork();
 	if (value.fork_id == -1)
 	{
-		close(value.p_pipe[0]);
+		close(value.p_pipe);
 		close(value.fd_file2);
 		perror("fork");
 		exit(1);
 	}
 	if (value.fork_id == 0)
 	{
-		if (dup2(value.p_pipe[0], 0) == -1)
+		if (dup2(value.p_pipe, 0) == -1)
 		{
-			close(value.p_pipe[0]);
+			close(value.p_pipe);
 			close(value.fd_file2);
 			perror("dup");
 			exit(1); // close meme chose dans le pere
 		}
 		if (dup2(value.fd_file2, 1)  == -1)
 		{
-			close(value.p_pipe[0]);
+			close(value.p_pipe);
 			close(value.fd_file2);
 			perror("dup");
 			exit(1); // close meme chose dansl epere
 		}
-		close(value.p_pipe[0]);
+		close(value.p_pipe);
 		close(value.fd_file2);
 		value.argv_cmd = ft_split(argv[argc - 2] , ' ');
 		value.path = get_path(value.argv_cmd[0], value.env);
 		execve(value.path, value.argv_cmd, value.env);
 		exit(1);
 	}
-	close(value.p_pipe[0]);
+	close(value.p_pipe);
 	close(value.fd_file2);
 	value.i = 0;
 	while (value.i < value.nb_cmd)
