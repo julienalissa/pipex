@@ -59,11 +59,4 @@ void	execute_here_doc(t_list *value, char **argv, int argc)
 	value->fd_file1 = ft_heredoc(argv[2]);
 	value->i = 3;
 	value->nb_cmd = argc - 4;
-	value->fd_file2 = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0777);
-	if (value->fd_file2 == -1)
-	{
-		close(value->fd_file1);
-		perror("file2");
-		exit(1);
-	}
 }

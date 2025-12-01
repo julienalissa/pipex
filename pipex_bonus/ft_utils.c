@@ -23,7 +23,8 @@ void	ft_remove_quote(char **argv_cmd)
 	{
 		str = argv_cmd[i];
 		len = ft_strlen(str);
-		if (len >= 2 && ((str[0] == '\'' && str[len -1] == '\'') || (str[0] == '"' && str[len - 1] == '"')))
+		if (len >= 2 && ((str[0] == '\'' && str[len -1] == '\'')
+				|| (str[0] == '"' && str[len - 1] == '"')))
 		{
 			argv_cmd[i] = ft_substr(str, 1, len -2);
 			free(str);
@@ -38,6 +39,14 @@ void	ft_define_value(t_list *value, int argc, char **argv, char **environ)
 	value->env = environ;
 	value->argc = argc;
 	value->argv_cmd = NULL;
+	value->fd_file2 = open(argv[argc - 1],
+			O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (value->fd_file2 == -1)
+	{
+		close(value->fd_file1);
+		perror("file2");
+		exit(1);
+	}
 	if (ft_strncmp(argv[1], "here_doc", 9) == 0)
 		execute_here_doc(&(*value), argv, argc);
 	else
@@ -50,14 +59,6 @@ void	ft_define_value(t_list *value, int argc, char **argv, char **environ)
 		}
 		value->i = 2;
 		value->nb_cmd = argc - 3;
-		value->fd_file2 = open(argv[argc - 1],
-				O_WRONLY | O_CREAT | O_TRUNC, 0777);
-		if (value->fd_file2 == -1)
-		{
-			close(value->fd_file1);
-			perror("file2");
-			exit(1);
-		}
 	}
 }
 

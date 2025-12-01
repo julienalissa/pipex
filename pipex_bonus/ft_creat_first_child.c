@@ -16,15 +16,29 @@ void	ft_creat_pipe_and_fork_it(t_list *value)
 {
 	if (pipe(value->n_pipe) == -1)
 	{
-		ft_close_files(&(*value));
+		ft_close_files(value);
 		perror("pipe");
 		exit (1);
 	}
 	value->fork_id = fork();
 	if (value->fork_id == -1)
 	{
-		ft_close_files_and_n_pipe(&(*value));
+		ft_close_files_and_n_pipe(value);
 		perror("fork");
+		exit(1);
+	}
+}
+
+void	dup_on_first_child(t_list *value)
+{
+	if (dup2(value->fd_file1, 0) == -1)
+	{
+		ft_close_files_and_n_pipe(value);
+		exit(1);
+	}
+	if (dup2(value->n_pipe[1], 1) == -1)
+	{
+		ft_close_files_and_n_pipe(value);
 		exit(1);
 	}
 }
@@ -33,17 +47,8 @@ void	ft_process_first_child(t_list *value)
 {
 	if (value->fork_id == 0)
 	{
-		if (dup2(value->fd_file1, 0) == -1)
-		{
-			ft_close_files_and_n_pipe(&(*value));
-			exit(1);
-		}
-		if (dup2(value->n_pipe[1], 1) == -1)
-		{
-			ft_close_files_and_n_pipe(&(*value));
-			exit(1);
-		}
-		ft_close_files_and_n_pipe(&(*value));
+		dup_on_first_child(value);
+		ft_close_files_and_n_pipe(value);
 		value->argv_cmd = ft_split(value->argv[value->i], ' ');
 		ft_remove_quote(value->argv_cmd);
 		value->path = get_path(value->argv_cmd[0], value->env);
@@ -60,15 +65,14 @@ void	ft_process_first_child(t_list *value)
 			perror("execeve");
 			exit(1);
 		}
-
 	}
 }
 
 void	ft_creat_first_child(t_list *value)
 {
-	ft_creat_pipe_and_fork_it(&(*value));
-	ft_process_first_child(&(*value));
+	ft_creat_pipe_and_fork_it(value);
+	ft_process_first_child(value);
 	value->p_pipe = value->n_pipe[0];
-	ft_close_not_used_files(&(*value));
+	ft_close_not_used_files(value);
 	value->i++;
 }
