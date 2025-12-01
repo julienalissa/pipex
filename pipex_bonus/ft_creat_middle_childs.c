@@ -57,16 +57,22 @@ void	ft_process_middle_childs(t_list *value)
 		if (!value->path)
 		{
 			perror("path");
+			ft_free_str(value->argv_cmd);
 			exit(1);
 		}
-		execve(value->path, value->argv_cmd, value->env);
-		exit(1);
+		if (execve(value->path, value->argv_cmd, value->env) == -1)
+		{
+			free(value->path);
+			ft_free_str(value->argv_cmd);
+			perror("execeve");
+			exit(1);
+		}
 	}
 }
 
 void	ft_creat_middle_childs(t_list *value)
 {
-	while (value->i < value->argc - 2)
+ 
 	{
 		ft_creat_pipe_and_fork(&(*value));
 		ft_process_middle_childs(&(*value));

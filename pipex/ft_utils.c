@@ -38,32 +38,27 @@ void	ft_define_value(t_list *value, int argc, char **argv, char **environ)
 	value->env = environ;
 	value->argc = argc;
 	value->argv_cmd = NULL;
-	if (ft_strncmp(argv[1], "here_doc", 9) == 0)
-		execute_here_doc(&(*value), argv, argc);
-	else
+	value->fd_file1 = open(argv[1], O_RDONLY);
+	if (value->fd_file1 == -1)
 	{
-		value->fd_file1 = open(argv[1], O_RDONLY);
-		if (value->fd_file1 == -1)
-		{
-			perror("file1");
-			exit (1);
-		}
-		value->i = 2;
-		value->nb_cmd = argc - 3;
-		value->fd_file2 = open(argv[argc - 1],
-				O_WRONLY | O_CREAT | O_TRUNC, 0777);
-		if (value->fd_file2 == -1)
-		{
-			close(value->fd_file1);
-			perror("file2");
-			exit(1);
-		}
+		perror("file1");
+		exit (1);
+	}
+	value->i = 2;
+	value->nb_cmd = argc - 3;
+	value->fd_file2 = open(argv[argc - 1],
+			O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (value->fd_file2 == -1)
+	{
+		close(value->fd_file1);
+		perror("file2");
+		exit(1);
 	}
 }
 
 void	ft_check_less_five_arg(int argcc)
 {
-	if (argcc < 5)
+	if (argcc != 5)
 	{
 		write(1, "./pipex file1 cmd1 cmd2 file2\n", 31);
 		exit (1);
