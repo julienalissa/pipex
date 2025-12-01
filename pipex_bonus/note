@@ -1,0 +1,5 @@
+< file0 ls | wc > file4
+
+il faut tout de meme ls dans file4
+
+code d'erreur

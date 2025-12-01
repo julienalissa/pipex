@@ -43,7 +43,7 @@ void	ft_process_last_fork(t_list *value)
 {
 	if (value->fork_id == 0)
 	{
-		ft_dup_last(&(*value));
+		ft_dup_last(value);
 		ft_close_prev_files(&(*value));
 		value->argv_cmd = ft_split(value->argv[value->argc - 2], ' ');
 		ft_remove_quote(value->argv_cmd);

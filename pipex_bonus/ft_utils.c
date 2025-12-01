@@ -40,7 +40,7 @@ void	ft_define_value(t_list *value, int argc, char **argv, char **environ)
 	value->argc = argc;
 	value->argv_cmd = NULL;
 	value->fd_file2 = open(argv[argc - 1],
-			O_WRONLY | O_CREAT | O_TRUNC, 0777);
+			O_WRONLY | O_CREAT | O_APPEND, 0777);
 	if (value->fd_file2 == -1)
 	{
 		close(value->fd_file1);
