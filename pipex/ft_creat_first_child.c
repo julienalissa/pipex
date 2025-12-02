@@ -48,7 +48,8 @@ void	ft_process_first_child(t_list *value)
 	if (value->fork_id == 0)
 	{
 		dup_on_first_child(value);
-		ft_close_files_and_n_pipe(&(*value));
+		ft_close_files_and_n_pipe(value);
+		ft_is_space(value->argv[value->i]);
 		value->argv_cmd = ft_split(value->argv[value->i], ' ');
 		ft_remove_quote(value->argv_cmd);
 		value->path = get_path(value->argv_cmd[0], value->env);

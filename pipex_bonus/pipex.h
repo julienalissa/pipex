@@ -90,5 +90,6 @@ int		ft_heredoc(char *delimiter);
 void	ft_define_value(t_list *value, int argc, char **argv, char **environ);
 void	ft_check_less_five_arg(int argcc);
 void	ft_free_str(char **str);
+void	ft_is_space(char *s);
 
 #endif

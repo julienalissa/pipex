@@ -45,6 +45,7 @@ void	ft_process_last_fork(t_list *value)
 	{
 		ft_dup_last(value);
 		ft_close_prev_files(value);
+		ft_is_space(value->argv[value->i]);
 		value->argv_cmd = ft_split(value->argv[value->argc - 2], ' ');
 		ft_remove_quote(value->argv_cmd);
 		value->path = get_path(value->argv_cmd[0], value->env);
@@ -79,6 +80,4 @@ void	ft_creat_last_child(t_list *value)
 	}
 	if (WIFEXITED(value->status))
 		exit(WEXITSTATUS(value->status));
-	else
-		exit(1);
 }

@@ -19,6 +19,8 @@ void	ft_remove_quote(char **argv_cmd)
 	char	*str;
 
 	i = 0;
+	if (!argv_cmd || !argv_cmd[0])
+		return ;
 	while (argv_cmd[i])
 	{
 		str = argv_cmd[i];
@@ -40,7 +42,7 @@ void	ft_define_value(t_list *value, int argc, char **argv, char **environ)
 	value->argc = argc;
 	value->argv_cmd = NULL;
 	value->fd_file2 = open(argv[argc - 1],
-		O_WRONLY | O_CREAT | O_TRUNC, 0777);
+			O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (value->fd_file2 == -1)
 	{
 		perror("file2");
@@ -78,4 +80,22 @@ void	ft_free_str(char **str)
 		i++;
 	}
 	free(str);
+}
+
+void	ft_is_space(char *s)
+{
+	int	i;
+	int	len;
+
+	len = ft_strlen(s);
+	len--;
+	i = 0;
+	while (s[i])
+	{
+		if (s[i] != ' ')
+			return ;
+		i++;
+	}
+	perror("path");
+	exit(127);
 }

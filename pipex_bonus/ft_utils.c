@@ -84,3 +84,21 @@ void	ft_free_str(char **str)
 	}
 	free(str);
 }
+
+void	ft_is_space(char *s)
+{
+	int	i;
+	int	len;
+
+	len = ft_strlen(s);
+	len--;
+	i = 0;
+	while (s[i])
+	{
+		if (s[i] != ' ')
+			return ;
+		i++;
+	}
+	perror("path");
+	exit(127);
+}
